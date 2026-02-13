@@ -1,100 +1,464 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Khảo sát tham dự họp lớp Tết 2026">
     <title>Khảo Sát Họp Lớp 2026</title>
-    
-    <!-- Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    
-    <!-- External Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            overflow-x: hidden;
+            background: #0a0e27;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .retro-font {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Retro Card Styles */
+        .retro-card {
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .retro-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #000;
+        }
+
+        .retro-card-alt {
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            background: #fff;
+        }
+
+        /* Button Styles */
+        .retro-btn {
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            transition: all 0.2s;
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+        }
+
+        .retro-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .retro-btn-primary {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
+        .retro-btn-primary:hover {
+            background: #ff5252;
+        }
+
+        .retro-btn-secondary {
+            background: #4ecdc4;
+            color: #000;
+        }
+
+        .retro-btn-secondary:hover {
+            background: #45b7af;
+        }
+
+        .retro-btn-tertiary {
+            background: #ffe66d;
+            color: #000;
+        }
+
+        .retro-btn-tertiary:hover {
+            background: #ffd93d;
+        }
+
+        /* Marquee Animation */
+        .marquee-container {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        .marquee-track {
+            display: flex;
+            will-change: transform;
+            cursor: grab;
+        }
+
+        /* Member Card */
+        .member-card {
+            flex-shrink: 0;
+            width: 300px;
+            margin: 0 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .member-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .member-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: #4ade80;
+            border: 3px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Calendar Heatmap */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .calendar-day {
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 140px;
+        }
+
+        .calendar-day:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 #000;
+        }
+
+        .calendar-day.selected {
+            border-color: #ff6b6b;
+            box-shadow: 6px 6px 0 #ff6b6b;
+        }
+
+        .calendar-day.selected:hover {
+            box-shadow: 8px 8px 0 #ff6b6b;
+        }
+
+        .info-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #4ecdc4;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 6px solid #000;
+            box-shadow: 12px 12px 0 #000;
+            max-width: 500px;
+            width: 90%;
+            padding: 30px;
+        }
+
+        /* Popover */
+        .popover {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            padding: 15px;
+            z-index: 100;
+            max-width: 250px;
+        }
+
+        .popover.active {
+            display: block;
+        }
+
+        /* Teacher Card */
+        .teacher-card {
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background: #fff;
+        }
+
+        .teacher-card.selected {
+            background: #4ade80;
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 #000;
+        }
+
+        .teacher-checkmark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 35px;
+            height: 35px;
+            background: #4ade80;
+            border: 3px solid #000;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .teacher-card.selected .teacher-checkmark {
+            display: flex;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid #000;
+            border-top: 4px solid #ff6b6b;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Glitch Effect for Title */
+        .glitch {
+            position: relative;
+            color: #fff;
+            font-size: clamp(32px, 8vw, 72px);
+            text-shadow:
+                3px 3px 0 #ff6b6b,
+                -3px -3px 0 #4ecdc4;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+
+            0%,
+            100% {
+                text-shadow:
+                    3px 3px 0 #ff6b6b,
+                    -3px -3px 0 #4ecdc4;
+            }
+
+            25% {
+                text-shadow:
+                    -3px 3px 0 #ff6b6b,
+                    3px -3px 0 #4ecdc4;
+            }
+
+            50% {
+                text-shadow:
+                    3px -3px 0 #ff6b6b,
+                    -3px 3px 0 #4ecdc4;
+            }
+
+            75% {
+                text-shadow:
+                    -3px -3px 0 #ff6b6b,
+                    3px 3px 0 #4ecdc4;
+            }
+        }
+
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg,
+                    rgba(0, 0, 0, 0.1) 0px,
+                    transparent 2px,
+                    transparent 4px);
+            z-index: 9999;
+        }
+
+        /* Pixel Border */
+        .pixel-border {
+            border: 4px solid #000;
+            border-image: repeating-linear-gradient(45deg,
+                    #000 0,
+                    #000 10px,
+                    transparent 10px,
+                    transparent 20px) 4;
+        }
+
+        /* Neon Glow */
+        .neon-text {
+            color: #fff;
+            text-shadow:
+                0 0 10px #ff6b6b,
+                0 0 20px #ff6b6b,
+                0 0 30px #ff6b6b,
+                0 0 40px #ff6b6b;
+        }
+
+        .bg-pattern {
+            background-color: #0a0e27;
+            background-image:
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 107, 107, .1) 35px, rgba(255, 107, 107, .1) 70px);
+        }
+    </style>
 </head>
+
 <body class="bg-pattern">
-    
-    <!-- Scanline Effect Overlay -->
-    <div class="scanlines" aria-hidden="true"></div>
-    
-    <!-- Main Application Container -->
-    <main class="slide-container" id="app" role="main">
-        
-        <!-- Slide 1: Welcome -->
-        <section class="slide" id="slide-welcome" data-slide="1">
-            <div class="slide-content">
-                <h1 class="glitch pixel-font">HỌP LỚP<br>2026</h1>
-                <p class="retro-font neon-text text-3xl md:text-4xl mb-4">Tết Bính Ngọ</p>
-                <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">Khảo Sát Tham Dự</p>
-                <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-12 py-6 text-lg md:text-xl">
-                    Bắt Đầu
-                </button>
+    <!-- Scanlines Effect -->
+    <div class="scanlines"></div>
+
+    <!-- Main Container -->
+    <div class="slide-container" id="slideContainer">
+
+        <!-- Slide 1: Welcome Hero -->
+        <div class="slide" id="slide1" style="transform: translateX(0%);">
+            <div class="h-full flex flex-col items-center justify-center px-6">
+                <div class="text-center">
+                    <h1 class="glitch pixel-font mb-8">HỌP LỚP<br>2026</h1>
+                    <p class="retro-font text-white text-3xl md:text-4xl mb-4 neon-text">
+                        Tết Bính Ngọ
+                    </p>
+                    <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">
+                        Khảo Sát Tham Dự
+                    </p>
+                    <button onclick="nextSlide()" class="retro-btn retro-btn-primary px-12 py-6 text-lg md:text-xl">
+                        Bắt Đầu
+                    </button>
+                </div>
             </div>
-        </section>
+        </div>
 
         <!-- Slide 2: Member Selection -->
-        <section class="slide" id="slide-member" data-slide="2">
-            <div class="slide-content-scroll">
+        <div class="slide" id="slide2" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col px-6 py-12 overflow-y-auto">
                 <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-8">
                     Chọn Tên Bạn
                 </h2>
-                
+
                 <div class="marquee-container mb-12">
-                    <div class="marquee-track" id="memberMarquee"></div>
+                    <div class="marquee-track" id="memberMarquee">
+                        <!-- Members will be loaded here -->
+                    </div>
                 </div>
 
                 <div class="text-center mt-auto">
                     <p class="retro-font text-gray-400 text-2xl mb-4">
                         Vuốt hoặc chờ thẻ của bạn xuất hiện
                     </p>
-                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                    <button onclick="prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
                         Quay Lại
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Slide 3: Attendance -->
-        <section class="slide" id="slide-attendance" data-slide="3">
-            <div class="slide-content">
+        <!-- Slide 3: Attendance RSVP -->
+        <div class="slide" id="slide3" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col px-6 py-12">
                 <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-12">
                     Bạn Có Tham Gia?
                 </h2>
-                
-                <div class="attendance-options">
-                    <button onclick="app.selectAttendance('Yes')" class="attendance-card attendance-yes">
+
+                <div class="flex-1 flex flex-col justify-center gap-6 max-w-2xl mx-auto w-full">
+                    <button onclick="selectAttendance('Yes')" class="retro-card-alt p-8 hover:bg-green-100">
                         <p class="retro-font text-4xl md:text-5xl font-bold mb-2">✓ CÓ</p>
                         <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi sẽ tham gia!</p>
                     </button>
-                    
-                    <button onclick="app.selectAttendance('Maybe')" class="attendance-card attendance-maybe">
+
+                    <button onclick="selectAttendance('Maybe')" class="retro-card-alt p-8 hover:bg-yellow-100">
                         <p class="retro-font text-4xl md:text-5xl font-bold mb-2">? CÂN NHẮC</p>
                         <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi chưa chắc...</p>
                     </button>
-                    
-                    <button onclick="app.selectAttendance('No')" class="attendance-card attendance-no">
+
+                    <button onclick="selectAttendance('No')" class="retro-card-alt p-8 hover:bg-red-100">
                         <p class="retro-font text-4xl md:text-5xl font-bold mb-2">✗ KHÔNG</p>
                         <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi không thể tham gia</p>
                     </button>
                 </div>
 
                 <div class="text-center mt-8">
-                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                    <button onclick="prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
                         Quay Lại
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Slide 4: Calendar -->
-        <section class="slide" id="slide-calendar" data-slide="4">
-            <div class="slide-content-scroll">
+        <!-- Slide 4: Interactive Heatmap Calendar -->
+        <div class="slide" id="slide4" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col px-6 py-12 overflow-y-auto">
                 <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-4">
                     Chọn Ngày Bạn Có Thể
                 </h2>
@@ -102,29 +466,28 @@
                     Chọn nhiều ngày nếu bạn linh hoạt
                 </p>
 
-                <!-- Loading State -->
-                <div id="calendarLoading" class="loading-container">
+                <div id="loadingCalendar" class="flex justify-center items-center py-12">
                     <div class="spinner"></div>
-                    <p class="retro-font text-white text-xl mt-4">Đang tải lịch...</p>
                 </div>
 
-                <!-- Calendar Grid -->
-                <div class="calendar-grid" id="calendarGrid" style="display: none;"></div>
+                <div class="calendar-grid mb-8" id="calendarGrid" style="display: none;">
+                    <!-- Calendar days will be loaded here -->
+                </div>
 
-                <div class="action-buttons">
-                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                <div class="flex gap-4 justify-center mt-auto flex-wrap">
+                    <button onclick="prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
                         Quay Lại
                     </button>
-                    <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
+                    <button onclick="nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
                         Tiếp Tục
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Slide 5: Teachers -->
-        <section class="slide" id="slide-teachers" data-slide="5">
-            <div class="slide-content-scroll">
+        <!-- Slide 5: Teacher Visit -->
+        <div class="slide" id="slide5" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col px-6 py-12 overflow-y-auto">
                 <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-4">
                     Thăm Thầy Cô?
                 </h2>
@@ -132,95 +495,746 @@
                     Chọn giáo viên bạn muốn thăm
                 </p>
 
-                <div class="teacher-grid" id="teacherGrid"></div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8" id="teacherGrid">
+                    <!-- Teachers will be loaded here -->
+                </div>
 
-                <div class="action-buttons">
-                    <button onclick="app.skipTeachers()" class="retro-btn retro-btn-tertiary px-8 py-4 text-base">
+                <div class="flex gap-4 justify-center mt-auto flex-wrap">
+                    <button onclick="selectTeacherVisit(false)"
+                        class="retro-btn retro-btn-tertiary px-8 py-4 text-base">
                         Bỏ Qua
                     </button>
-                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                    <button onclick="prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
                         Quay Lại
                     </button>
-                    <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
+                    <button onclick="nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
                         Tiếp Tục
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Slide 6: Feedback -->
-        <section class="slide" id="slide-feedback" data-slide="6">
-            <div class="slide-content">
+        <div class="slide" id="slide6" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col px-6 py-12">
                 <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-8">
                     Ý Kiến Đóng Góp
                 </h2>
-                
-                <div class="feedback-container">
-                    <textarea 
-                        id="feedbackInput" 
-                        class="feedback-textarea"
-                        placeholder="Chia sẻ ý tưởng, đề xuất của bạn..."
-                        maxlength="500"
-                    ></textarea>
-                    <p class="retro-font text-gray-400 text-sm mt-2">
-                        <span id="charCount">0</span>/500 ký tự
-                    </p>
+
+                <div class="flex-1 max-w-2xl mx-auto w-full">
+                    <textarea id="ideasInput"
+                        class="w-full h-64 p-6 retro-font text-2xl border-4 border-black shadow-[8px_8px_0_#000] resize-none focus:outline-none focus:shadow-[10px_10px_0_#000]"
+                        placeholder="Chia sẻ ý tưởng, đề xuất của bạn..."></textarea>
                 </div>
 
-                <div class="action-buttons">
-                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                <div class="flex gap-4 justify-center mt-8 flex-wrap">
+                    <button onclick="prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
                         Quay Lại
                     </button>
-                    <button onclick="app.submitSurvey()" class="retro-btn retro-btn-primary px-12 py-4 text-base" id="submitBtn">
+                    <button onclick="submitSurvey()" class="retro-btn retro-btn-primary px-12 py-4 text-base"
+                        id="submitBtn">
                         Gửi Khảo Sát
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Slide 7: Completion -->
-        <section class="slide" id="slide-complete" data-slide="7">
-            <div class="slide-content">
-                <h1 class="pixel-font text-white text-3xl md:text-5xl mb-8 neon-text">
-                    CẢM ƠN BẠN!
-                </h1>
-                <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">
-                    Khảo sát đã được ghi nhận.<br>
-                    Hẹn gặp bạn trong dịp Tết!
-                </p>
-                <div class="text-6xl mb-8" aria-label="celebration">🎉</div>
-                <button onclick="app.reset()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
-                    Làm Lại
-                </button>
+        <div class="slide" id="slide7" style="transform: translateX(100%);">
+            <div class="h-full flex flex-col items-center justify-center px-6">
+                <div class="text-center">
+                    <h1 class="pixel-font text-white text-3xl md:text-5xl mb-8 neon-text">
+                        CẢM ƠN BẠN!
+                    </h1>
+                    <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">
+                        Khảo sát đã được ghi nhận.<br>
+                        Hẹn gặp bạn trong dịp Tết!
+                    </p>
+                    <div class="text-6xl mb-8">🎉</div>
+                    <button onclick="resetSurvey()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Làm Lại
+                    </button>
+                </div>
             </div>
-        </section>
+        </div>
 
-    </main>
+    </div>
 
-    <!-- Modal: Member Confirmation -->
-    <div class="modal" id="memberModal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <!-- Modal for Member Confirmation -->
+    <div class="modal" id="memberModal">
         <div class="modal-content">
-            <h3 class="pixel-font text-2xl mb-6 text-center" id="modalTitle">Xác Nhận</h3>
+            <h3 class="pixel-font text-2xl mb-6 text-center">Xác Nhận</h3>
             <p class="retro-font text-2xl text-center mb-8" id="modalText"></p>
-            <div class="modal-actions">
-                <button onclick="app.cancelMemberSelection()" class="retro-btn retro-btn-secondary px-6 py-3 text-sm">
+            <div class="flex gap-4 justify-center">
+                <button onclick="cancelMemberSelection()" class="retro-btn retro-btn-secondary px-6 py-3 text-sm">
                     Không
                 </button>
-                <button onclick="app.confirmMemberSelection()" class="retro-btn retro-btn-primary px-6 py-3 text-sm">
+                <button onclick="confirmMemberSelection()" class="retro-btn retro-btn-primary px-6 py-3 text-sm">
                     Đúng Rồi
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Popover: Calendar Info -->
-    <div class="popover" id="calendarPopover" role="tooltip">
+    <!-- Popover for Calendar Info -->
+    <div class="popover" id="popover">
         <p class="retro-font text-xl font-bold mb-2">Đã chọn ngày này:</p>
         <ul class="retro-font text-lg" id="popoverList"></ul>
     </div>
 
-    <!-- Scripts -->
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script>
+        // =====================================
+        // CONFIGURATION & GLOBAL STATE
+        // =====================================
+
+        // Replace with your Google Apps Script Web App URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyZ2EPfu2Z5sHXyAsMPFzGhhgVX1iZMm9q3X8VtIDl8U8dlrnjAs2NzmB4fhzlD-VETDQ/exec';
+
+        const MEMBERS = [
+            { user_id: '01', name: 'Quỳnh Anh', photo: './images/01QuynhAnh.jpg' },
+            { user_id: '02', name: 'khánh Đoan', photo: './images/02KhanhDoan.jpg' },
+            { user_id: '03', name: 'Thanh Hà', photo: './images/03ThanhHa.jpg' },
+            { user_id: '04', name: 'Khả Hân', photo: './images/04KhaHan.jpg' },
+            { user_id: '05', name: 'Quốc Huy', photo: './images/05QuocHuy.jpg' },
+            { user_id: '06', name: 'Thanh Huyền', photo: './images/06ThanhHuyen.jpg' },
+            { user_id: '07', name: 'Xuân Hương', photo: './images/07XuanHuong.png' },
+            { user_id: '08', name: 'Quỳnh Hương', photo: './images/08QuynhHuong.jpg' },
+            { user_id: '09', name: 'Nam Khánh', photo: './images/09NamKhanh.jpg' },
+            { user_id: '10', name: 'Cảnh Lâm', photo: './images/10CanhLam.JPG' },
+            { user_id: '11', name: 'Ngọc linh', photo: './images/11NgocLinh.jpg' },
+            { user_id: '12', name: 'Thảo Linh', photo: './images/12ThaoLinh.jpg' },
+            { user_id: '13', name: 'Văn Nam', photo: './images/13VanNam.jpg' },
+            { user_id: '14', name: 'Phương Nam', photo: './images/14PhuongNam.jpg' },
+            { user_id: '15', name: 'Vĩnh Nghi', photo: './images/15VinhNghi.jpg' },
+            { user_id: '16', name: 'Như Ngọc', photo: './images/16NhuNgoc.jpg' },
+            { user_id: '17', name: 'Cao Nguyên', photo: './images/17CaoNguyen.jpg' },
+            { user_id: '18', name: 'Minh Nhật', photo: './images/18MinhNhat.jpg' },
+            { user_id: '19', name: 'Tuyết Nhi', photo: './images/19TuyetNhi.jpg' },
+            { user_id: '20', name: 'Quỳnh Như', photo: './images/20QuynhNhu.jpg' },
+            { user_id: '21', name: 'Phúc Sơn', photo: './images/21PhucSon.jpg' },
+            { user_id: '22', name: 'Bách Thành', photo: './images/22BachThanh.jpg' },
+            { user_id: '23', name: 'Thu Thảo', photo: './images/23ThuThao.jpg' },
+            { user_id: '24', name: 'Uyên Thi', photo: './images/24UyenThi.jpg' },
+            { user_id: '25', name: 'Quốc Thịnh', photo: './images/25QuocThinh.jpg' },
+            { user_id: '26', name: 'Thủy Tiên', photo: './images/26ThuyTien.jpg' },
+            { user_id: '27', name: 'Bảo Toàn', photo: './images/27BaoToan.jpg' },
+            { user_id: '28', name: 'Bảo Trâm', photo: './images/28BaoTram.jpg' },
+            { user_id: '29', name: 'Ngọc Trân', photo: './images/29NgocTran.jpg' },
+            { user_id: '30', name: 'Phương Trinh', photo: './images/30PhuongTrinh.png' },
+            { user_id: '31', name: 'Đình Trung', photo: './images/31DinhTrung.jpg' },
+            { user_id: '32', name: 'Thanh Tùng', photo: './images/32ThanhTung.jpg' },
+            { user_id: '33', name: 'Cát Tường', photo: './images/33CatTuong.jpg' },
+            { user_id: '34', name: 'Phương Uyên', photo: './images/34PhuongUyen.jpg' },
+            { user_id: '35', name: 'Khánh Vân', photo: './images/35khanhVan.jpg' },
+            { user_id: '36', name: 'Hạ Vân', photo: './images/36HaVan.jpg' },
+            { user_id: '37', name: 'Minh Vũ', photo: './images/37MinhVu.jpg' },
+            { user_id: '38', name: 'Thanh Xuân', photo: './images/38ThanhXuan.jpg' },
+            { user_id: '39', name: 'Đoan Trang', photo: './images/39DoanTrang.jpg' },
+            { user_id: '40', name: 'Như Thuần', photo: './images/40NhuThuan.jpg' }
+        ];
+
+        const TEACHERS = [
+            { id: 'teacher_001', name: 'Cô liên', subject: '2019-2020', photo: 'images/mslien.JPG' },
+            { id: 'teacher_002', name: 'Cô Minh', subject: '2018-2019', photo: 'images/msMinh.JPG' },
+        ];
+
+
+        const CALENDAR_DATES = [
+            { date: '2026-02-17', label: 'Mùng 1 Tết', day: '17', month: 'Thg 2' },
+            { date: '2026-02-18', label: 'Mùng 2 Tết', day: '18', month: 'Thg 2' },
+            { date: '2026-02-19', label: 'Mùng 3 Tết', day: '19', month: 'Thg 2' },
+            { date: '2026-02-20', label: 'Mùng 4 Tết', day: '20', month: 'Thg 2' },
+            { date: '2026-02-21', label: 'Mùng 5 Tết', day: '21', month: 'Thg 2' }
+        ];
+
+        // Application state
+        let currentSlide = 1;
+        let surveyData = {
+            user_id: null,
+            name: null,
+            attendance: null,
+            selected_dates: [],
+            visit_teachers: false,
+            teacher_list: [],
+            ideas: ''
+        };
+
+        let selectedMember = null;
+        let calendarHeatmapData = {};
+        let submittedUsers = new Set();
+
+        // =====================================
+        // INITIALIZATION
+        // =====================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadMemberMarquee();
+            loadTeacherGrid();
+            initializeMarqueeSwipe();
+        });
+
+        // =====================================
+        // MEMBER SELECTION (SLIDE 2)
+        // =====================================
+
+        function loadMemberMarquee() {
+            const marquee = document.getElementById('memberMarquee');
+
+            // Create two sets of members for seamless loop
+            const memberCards = MEMBERS.concat(MEMBERS).map(member => {
+                const hasSubmitted = submittedUsers.has(member.user_id);
+                return `
+            <div class="member-card retro-card" onclick="selectMember('${member.user_id}', '${member.name}')">
+                <img src="${member.photo}" alt="${member.name}">
+                <div class="p-4 text-center bg-white">
+                    <p class="retro-font text-2xl font-bold">${member.name}</p>
+                </div>
+                ${hasSubmitted ? '<div class="member-badge">✓</div>' : ''}
+            </div>
+        `;
+            }).join('');
+
+            marquee.innerHTML = memberCards;
+        }
+
+        function selectMember(userId, name) {
+            selectedMember = { user_id: userId, name: name };
+            document.getElementById('modalText').textContent = `Bạn là ${name}, đúng không?`;
+            document.getElementById('memberModal').classList.add('active');
+        }
+
+        function confirmMemberSelection() {
+            if (selectedMember) {
+                surveyData.user_id = selectedMember.user_id;
+                surveyData.name = selectedMember.name;
+                document.getElementById('memberModal').classList.remove('active');
+                nextSlide();
+            }
+        }
+
+        function cancelMemberSelection() {
+            selectedMember = null;
+            document.getElementById('memberModal').classList.remove('active');
+        }
+
+        // =====================================
+        // MARQUEE SWIPE FUNCTIONALITY
+        // =====================================
+        function initializeMarqueeSwipe() {
+            const track = document.getElementById('memberMarquee');
+            const container = track.parentElement;
+
+            let position = 0;
+
+            const baseSpeed = -1;
+            let velocity = baseSpeed;
+
+            let isDragging = false;
+            let lastX = 0;
+
+            let mouseInfluence = 0; // desktop control
+
+            const singleSetWidth = track.scrollWidth / 2;
+
+            function loop() {
+                if (!isDragging) {
+                    const targetVelocity = baseSpeed + mouseInfluence;
+                    velocity += (targetVelocity - velocity) * 0.05;
+                    position += velocity;
+                }
+
+                if (position <= -singleSetWidth) {
+                    position += singleSetWidth;
+                }
+
+                if (position > 0) {
+                    position -= singleSetWidth;
+                }
+
+                track.style.transform = `translateX(${position}px)`;
+
+                requestAnimationFrame(loop);
+            }
+
+            loop();
+
+            /* ---------------- DRAG (MOBILE + DESKTOP) ---------------- */
+
+            track.addEventListener("mousedown", startDrag);
+            track.addEventListener("touchstart", startDrag);
+
+            window.addEventListener("mousemove", drag);
+            window.addEventListener("touchmove", drag, { passive: false });
+
+            window.addEventListener("mouseup", stopDrag);
+            window.addEventListener("touchend", stopDrag);
+
+            function startDrag(e) {
+                isDragging = true;
+                lastX = getX(e);
+                velocity = 0;
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+
+                e.preventDefault();
+
+                const x = getX(e);
+                const dx = x - lastX;
+
+                position += dx;
+                velocity = dx * 0.2;
+
+                track.style.transform = `translateX(${position}px)`;
+
+                lastX = x;
+            }
+
+            function stopDrag() {
+                isDragging = false;
+            }
+
+            function getX(e) {
+                return e.touches ? e.touches[0].pageX : e.pageX;
+            }
+
+            /* ---------------- DESKTOP HOVER CONTROL ---------------- */
+
+            container.addEventListener("mousemove", (e) => {
+                if ('ontouchstart' in window) return;
+
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const ratio = (x / rect.width) - 0.5;
+
+                mouseInfluence = ratio * 20;
+            });
+
+            container.addEventListener("mouseleave", () => {
+                mouseInfluence = 0;
+            });
+        }
+
+
+        // =====================================
+        // ATTENDANCE SELECTION (SLIDE 3)
+        // =====================================
+
+        function selectAttendance(status) {
+            surveyData.attendance = status;
+
+            if (status === 'No') {
+                // Skip to Slide 6 (Feedback)
+                goToSlide(6);
+            } else {
+                // Go to Slide 4 (Calendar)
+                nextSlide();
+                // Load calendar when entering slide 4
+                if (currentSlide === 4) {
+                    loadCalendar();
+                }
+            }
+        }
+
+        // =====================================
+        // CALENDAR HEATMAP (SLIDE 4)
+        // =====================================
+
+        function loadCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const loadingIndicator = document.getElementById('loadingCalendar');
+
+            // Show loading
+            loadingIndicator.style.display = 'flex';
+            calendarGrid.style.display = 'none';
+
+            // Simulate API call delay
+            setTimeout(() => {
+                const calendarHtml = CALENDAR_DATES.map(dateInfo => {
+                    const dateKey = dateInfo.date;
+                    const heatmapInfo = calendarHeatmapData[dateKey] || { count: 0, users: [] };
+                    const percentage = heatmapInfo.count > 0 ? (heatmapInfo.count / MEMBERS.length) * 100 : 0;
+
+                    // Calculate heatmap color
+                    let bgColor = 'bg-blue-100';
+                    if (percentage > 70) bgColor = 'bg-blue-900 text-white';
+                    else if (percentage > 50) bgColor = 'bg-blue-700 text-white';
+                    else if (percentage > 30) bgColor = 'bg-blue-500 text-white';
+                    else if (percentage > 10) bgColor = 'bg-blue-300';
+
+                    return `
+                <div class="calendar-day ${bgColor}" data-date="${dateKey}" onclick="toggleDate('${dateKey}')">
+                    <div class="info-icon" onclick="event.stopPropagation(); showPopover('${dateKey}', event)">i</div>
+                    <p class="retro-font text-3xl font-bold mb-2">${dateInfo.day}</p>
+                    <p class="retro-font text-xl mb-1">${dateInfo.month}</p>
+                    <p class="retro-font text-lg font-bold">${dateInfo.label}</p>
+                    <p class="retro-font text-sm mt-2">${heatmapInfo.count} người</p>
+                </div>
+            `;
+                }).join('');
+
+                calendarGrid.innerHTML = calendarHtml;
+                loadingIndicator.style.display = 'none';
+                calendarGrid.style.display = 'grid';
+            }, 500);
+        }
+
+        function toggleDate(date) {
+            const dateElement = document.querySelector(`[data-date="${date}"]`);
+
+            if (surveyData.selected_dates.includes(date)) {
+                // Remove date
+                surveyData.selected_dates = surveyData.selected_dates.filter(d => d !== date);
+                dateElement.classList.remove('selected');
+            } else {
+                // Add date
+                surveyData.selected_dates.push(date);
+                dateElement.classList.add('selected');
+            }
+        }
+
+        function showPopover(date, event) {
+            const popover = document.getElementById('popover');
+            const popoverList = document.getElementById('popoverList');
+
+            const heatmapInfo = calendarHeatmapData[date] || { count: 0, users: [] };
+
+            if (heatmapInfo.users.length === 0) {
+                popoverList.innerHTML = '<li>Chưa có ai chọn</li>';
+            } else {
+                popoverList.innerHTML = heatmapInfo.users.map(name => `<li>• ${name}</li>`).join('');
+            }
+
+            // Position popover
+            const rect = event.target.getBoundingClientRect();
+            popover.style.top = `${rect.bottom + 10}px`;
+            popover.style.left = `${rect.left - 100}px`;
+            popover.classList.add('active');
+
+            // Close on click outside
+            setTimeout(() => {
+                document.addEventListener('click', closePopover);
+            }, 100);
+        }
+
+        function closePopover() {
+            document.getElementById('popover').classList.remove('active');
+            document.removeEventListener('click', closePopover);
+        }
+
+        // =====================================
+        // TEACHER SELECTION (SLIDE 5)
+        // =====================================
+
+        function loadTeacherGrid() {
+            const teacherGrid = document.getElementById('teacherGrid');
+
+            const teacherCards = TEACHERS.map(teacher => `
+        <div class="teacher-card p-4 text-center" data-teacher-id="${teacher.id}" onclick="toggleTeacher('${teacher.id}')">
+            <div class="teacher-checkmark">✓</div>
+            <img src="${teacher.photo}" alt="${teacher.name}" class="w-full h-32 object-cover mb-3">
+            <p class="retro-font text-2xl font-bold mb-1">${teacher.name}</p>
+            <p class="retro-font text-lg">${teacher.subject}</p>
+        </div>
+    `).join('');
+
+            teacherGrid.innerHTML = teacherCards;
+        }
+
+        function toggleTeacher(teacherId) {
+            const card = document.querySelector(`[data-teacher-id="${teacherId}"]`);
+
+            if (surveyData.teacher_list.includes(teacherId)) {
+                surveyData.teacher_list = surveyData.teacher_list.filter(id => id !== teacherId);
+                card.classList.remove('selected');
+            } else {
+                surveyData.teacher_list.push(teacherId);
+                card.classList.add('selected');
+            }
+
+            surveyData.visit_teachers = surveyData.teacher_list.length > 0;
+        }
+
+        function selectTeacherVisit(skip) {
+            if (skip) {
+                surveyData.visit_teachers = false;
+                surveyData.teacher_list = [];
+            }
+            nextSlide();
+        }
+
+        // =====================================
+        // SUBMIT SURVEY
+        // =====================================
+
+        async function submitSurvey() {
+            const submitBtn = document.getElementById('submitBtn');
+            const ideasInput = document.getElementById('ideasInput');
+
+            // Validate required fields
+            if (!surveyData.user_id || !surveyData.name) {
+                alert('Vui lòng chọn tên của bạn!');
+                goToSlide(2);
+                return;
+            }
+
+            if (!surveyData.attendance) {
+                alert('Vui lòng chọn trạng thái tham gia!');
+                goToSlide(3);
+                return;
+            }
+
+            // Get ideas from textarea
+            surveyData.ideas = ideasInput.value.trim();
+
+            // Prepare data for submission
+            const submitData = {
+                timestamp: new Date().toISOString(),
+                user_id: surveyData.user_id,
+                name: surveyData.name,
+                attendance: surveyData.attendance,
+                selected_dates: surveyData.selected_dates.join(', '),
+                visit_teachers: surveyData.visit_teachers ? 'true' : 'false',
+                teacher_list: surveyData.teacher_list.map(id => {
+                    const teacher = TEACHERS.find(t => t.id === id);
+                    return teacher ? teacher.name : id;
+                }).join(', '),
+                ideas: surveyData.ideas
+            };
+
+            console.log('Submitting data:', submitData);
+            console.log('API URL:', API_URL);
+
+            // Check if API URL is configured
+            if (API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                alert('⚠️ Cần cập nhật API_URL trong file app.js!\n\nVui lòng xem hướng dẫn trong README.md');
+                submitBtn.textContent = 'Gửi Khảo Sát';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Show loading state
+            submitBtn.textContent = 'Đang Gửi...';
+            submitBtn.disabled = true;
+
+            // Submit using URL redirect method (bypasses CORS completely)
+            submitViaURLRedirect(submitData);
+        }
+
+        // Submit via URL redirect - most reliable method for Google Apps Script
+        function submitViaURLRedirect(data) {
+            console.log('Submitting via URL redirect with JSON params...');
+
+            // Create URL with JSON data as parameter
+            const jsonString = JSON.stringify(data);
+            const encodedData = encodeURIComponent(jsonString);
+
+            // Create redirect URL
+            const redirectURL = `${API_URL}?data=${encodedData}&method=submit`;
+
+            console.log('Redirect URL created (data length):', encodedData.length);
+
+            // Create hidden iframe for submission
+            let iframe = document.getElementById('submit-iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'submit-iframe';
+                iframe.name = 'submit-iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            // Set timeout to show success after redirect
+            setTimeout(() => {
+                console.log('Submission completed (timeout)');
+                showSuccessAnimation();
+                nextSlide();
+
+                // Reset button
+                setTimeout(() => {
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.textContent = 'Gửi Khảo Sát';
+                    submitBtn.disabled = false;
+                }, 1000);
+            }, 2000);
+
+            // Perform redirect in iframe
+            iframe.src = redirectURL;
+
+            console.log('Redirect initiated');
+        }
+
+        function showSuccessAnimation() {
+            // Confetti effect
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+
+        // =====================================
+        // SLIDE NAVIGATION
+        // =====================================
+
+        function nextSlide() {
+            if (currentSlide < 7) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        function goToSlide(slideNumber) {
+            const slides = document.querySelectorAll('.slide');
+
+            // Update transforms
+            slides.forEach((slide, index) => {
+                const slideNum = index + 1;
+                let transform;
+
+                if (slideNum < slideNumber) {
+                    transform = 'translateX(-100%)';
+                } else if (slideNum === slideNumber) {
+                    transform = 'translateX(0%)';
+                } else {
+                    transform = 'translateX(100%)';
+                }
+
+                slide.style.transform = transform;
+            });
+
+            currentSlide = slideNumber;
+
+            // Load calendar when entering slide 4
+            if (currentSlide === 4) {
+                setTimeout(() => loadCalendar(), 100);
+            }
+        }
+
+        function resetSurvey() {
+            // Reset data
+            surveyData = {
+                user_id: null,
+                name: null,
+                attendance: null,
+                selected_dates: [],
+                visit_teachers: false,
+                teacher_list: [],
+                ideas: ''
+            };
+
+            selectedMember = null;
+            document.getElementById('ideasInput').value = '';
+
+            // Reset teacher selections
+            document.querySelectorAll('.teacher-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Reset submit button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Gửi Khảo Sát';
+            submitBtn.disabled = false;
+
+            // Go back to start
+            goToSlide(1);
+        }
+
+        // =====================================
+        // API INTEGRATION
+        // =====================================
+
+        async function fetchExistingData() {
+            try {
+                // Fetch data from Google Apps Script
+                const response = await fetch(`${API_URL}?action=getData`);
+                const data = await response.json();
+
+                if (data && data.submissions) {
+                    processExistingData(data.submissions);
+                }
+            } catch (error) {
+                console.error('Error fetching existing data:', error);
+                // Use mock data for development
+                useMockData();
+            }
+        }
+
+        function processExistingData(submissions) {
+            submittedUsers.clear();
+            calendarHeatmapData = {};
+
+            submissions.forEach(submission => {
+                // Track submitted users
+                submittedUsers.add(submission.user_id);
+
+                // Process calendar dates
+                if (submission.selected_dates) {
+                    const dates = submission.selected_dates.split(',').map(d => d.trim());
+                    dates.forEach(date => {
+                        if (!calendarHeatmapData[date]) {
+                            calendarHeatmapData[date] = { count: 0, users: [] };
+                        }
+                        calendarHeatmapData[date].count++;
+                        calendarHeatmapData[date].users.push(submission.name);
+                    });
+                }
+            });
+
+            // Update member marquee with badges
+            loadMemberMarquee();
+        }
+
+        function useMockData() {
+            // Mock data for development/testing
+            const mockSubmissions = [
+                {
+                    user_id: 'member_001',
+                    name: 'Nguyễn Văn A',
+                    selected_dates: '2026-02-17, 2026-02-18'
+                },
+                {
+                    user_id: 'member_003',
+                    name: 'Lê Văn C',
+                    selected_dates: '2026-02-17, 2026-02-19'
+                },
+                {
+                    user_id: 'member_005',
+                    name: 'Hoàng Văn E',
+                    selected_dates: '2026-02-18, 2026-02-19, 2026-02-20'
+                }
+            ];
+
+            processExistingData(mockSubmissions);
+        }
+    </script>
 </body>
+
 </html>
