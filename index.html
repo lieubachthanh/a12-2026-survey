@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Khảo sát tham dự họp lớp Tết 2026">
+    <title>Khảo Sát Họp Lớp 2026</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-pattern">
+    
+    <!-- Scanline Effect Overlay -->
+    <div class="scanlines" aria-hidden="true"></div>
+    
+    <!-- Main Application Container -->
+    <main class="slide-container" id="app" role="main">
+        
+        <!-- Slide 1: Welcome -->
+        <section class="slide" id="slide-welcome" data-slide="1">
+            <div class="slide-content">
+                <h1 class="glitch pixel-font">HỌP LỚP<br>2026</h1>
+                <p class="retro-font neon-text text-3xl md:text-4xl mb-4">Tết Bính Ngọ</p>
+                <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">Khảo Sát Tham Dự</p>
+                <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-12 py-6 text-lg md:text-xl">
+                    Bắt Đầu
+                </button>
+            </div>
+        </section>
+
+        <!-- Slide 2: Member Selection -->
+        <section class="slide" id="slide-member" data-slide="2">
+            <div class="slide-content-scroll">
+                <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-8">
+                    Chọn Tên Bạn
+                </h2>
+                
+                <div class="marquee-container mb-12">
+                    <div class="marquee-track" id="memberMarquee"></div>
+                </div>
+
+                <div class="text-center mt-auto">
+                    <p class="retro-font text-gray-400 text-2xl mb-4">
+                        Vuốt hoặc chờ thẻ của bạn xuất hiện
+                    </p>
+                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Quay Lại
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Attendance -->
+        <section class="slide" id="slide-attendance" data-slide="3">
+            <div class="slide-content">
+                <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-12">
+                    Bạn Có Tham Gia?
+                </h2>
+                
+                <div class="attendance-options">
+                    <button onclick="app.selectAttendance('Yes')" class="attendance-card attendance-yes">
+                        <p class="retro-font text-4xl md:text-5xl font-bold mb-2">✓ CÓ</p>
+                        <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi sẽ tham gia!</p>
+                    </button>
+                    
+                    <button onclick="app.selectAttendance('Maybe')" class="attendance-card attendance-maybe">
+                        <p class="retro-font text-4xl md:text-5xl font-bold mb-2">? CÂN NHẮC</p>
+                        <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi chưa chắc...</p>
+                    </button>
+                    
+                    <button onclick="app.selectAttendance('No')" class="attendance-card attendance-no">
+                        <p class="retro-font text-4xl md:text-5xl font-bold mb-2">✗ KHÔNG</p>
+                        <p class="retro-font text-xl md:text-2xl text-gray-600">Tôi không thể tham gia</p>
+                    </button>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Quay Lại
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Calendar -->
+        <section class="slide" id="slide-calendar" data-slide="4">
+            <div class="slide-content-scroll">
+                <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-4">
+                    Chọn Ngày Bạn Có Thể
+                </h2>
+                <p class="retro-font text-gray-300 text-xl md:text-2xl text-center mb-8">
+                    Chọn nhiều ngày nếu bạn linh hoạt
+                </p>
+
+                <!-- Loading State -->
+                <div id="calendarLoading" class="loading-container">
+                    <div class="spinner"></div>
+                    <p class="retro-font text-white text-xl mt-4">Đang tải lịch...</p>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-grid" id="calendarGrid" style="display: none;"></div>
+
+                <div class="action-buttons">
+                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Quay Lại
+                    </button>
+                    <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
+                        Tiếp Tục
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Teachers -->
+        <section class="slide" id="slide-teachers" data-slide="5">
+            <div class="slide-content-scroll">
+                <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-4">
+                    Thăm Thầy Cô?
+                </h2>
+                <p class="retro-font text-gray-300 text-xl md:text-2xl text-center mb-8">
+                    Chọn giáo viên bạn muốn thăm
+                </p>
+
+                <div class="teacher-grid" id="teacherGrid"></div>
+
+                <div class="action-buttons">
+                    <button onclick="app.skipTeachers()" class="retro-btn retro-btn-tertiary px-8 py-4 text-base">
+                        Bỏ Qua
+                    </button>
+                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Quay Lại
+                    </button>
+                    <button onclick="app.nextSlide()" class="retro-btn retro-btn-primary px-8 py-4 text-base">
+                        Tiếp Tục
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Feedback -->
+        <section class="slide" id="slide-feedback" data-slide="6">
+            <div class="slide-content">
+                <h2 class="pixel-font text-white text-2xl md:text-4xl text-center mb-8">
+                    Ý Kiến Đóng Góp
+                </h2>
+                
+                <div class="feedback-container">
+                    <textarea 
+                        id="feedbackInput" 
+                        class="feedback-textarea"
+                        placeholder="Chia sẻ ý tưởng, đề xuất của bạn..."
+                        maxlength="500"
+                    ></textarea>
+                    <p class="retro-font text-gray-400 text-sm mt-2">
+                        <span id="charCount">0</span>/500 ký tự
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <button onclick="app.prevSlide()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                        Quay Lại
+                    </button>
+                    <button onclick="app.submitSurvey()" class="retro-btn retro-btn-primary px-12 py-4 text-base" id="submitBtn">
+                        Gửi Khảo Sát
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Completion -->
+        <section class="slide" id="slide-complete" data-slide="7">
+            <div class="slide-content">
+                <h1 class="pixel-font text-white text-3xl md:text-5xl mb-8 neon-text">
+                    CẢM ƠN BẠN!
+                </h1>
+                <p class="retro-font text-gray-300 text-2xl md:text-3xl mb-12">
+                    Khảo sát đã được ghi nhận.<br>
+                    Hẹn gặp bạn trong dịp Tết!
+                </p>
+                <div class="text-6xl mb-8" aria-label="celebration">🎉</div>
+                <button onclick="app.reset()" class="retro-btn retro-btn-secondary px-8 py-4 text-base">
+                    Làm Lại
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Member Confirmation -->
+    <div class="modal" id="memberModal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <h3 class="pixel-font text-2xl mb-6 text-center" id="modalTitle">Xác Nhận</h3>
+            <p class="retro-font text-2xl text-center mb-8" id="modalText"></p>
+            <div class="modal-actions">
+                <button onclick="app.cancelMemberSelection()" class="retro-btn retro-btn-secondary px-6 py-3 text-sm">
+                    Không
+                </button>
+                <button onclick="app.confirmMemberSelection()" class="retro-btn retro-btn-primary px-6 py-3 text-sm">
+                    Đúng Rồi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popover: Calendar Info -->
+    <div class="popover" id="calendarPopover" role="tooltip">
+        <p class="retro-font text-xl font-bold mb-2">Đã chọn ngày này:</p>
+        <ul class="retro-font text-lg" id="popoverList"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
